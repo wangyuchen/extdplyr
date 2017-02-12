@@ -20,6 +20,9 @@ that end with underscores).}
 \code{top2 = x > 5}.}
 
 \item{ret_factor}{Whether to convert the column into factor.}
+
+\item{.dots}{Used in conjunction with \code{...} to support both explicit
+and implicit arguments.}
 }
 \description{
 \code{ifelse_routine} functions like a serious of nested \code{ifelse} where

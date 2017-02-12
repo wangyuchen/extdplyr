@@ -19,7 +19,9 @@ check_se_column <- function(col_name) {
 #' @param col Name of the generated column. Use a bare name when using NSE
 #' functions and a character (quoted) name when using SE functions (functions
 #' that end with underscores).
+#' @param .dots Used in conjunction with \code{...} to support both explicit
+#' and implicit arguments.
 #' @keywords internal
-common_params <- function(data, col) {
+common_params <- function(data, col, .dots) {
   NULL
 }

@@ -4,7 +4,7 @@
 \alias{common_params}
 \title{Common parameters across routines}
 \usage{
-common_params(data, col)
+common_params(data, col, .dots)
 }
 \arguments{
 \item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
@@ -12,6 +12,9 @@ common_params(data, col)
 \item{col}{Name of the generated column. Use a bare name when using NSE
 functions and a character (quoted) name when using SE functions (functions
 that end with underscores).}
+
+\item{.dots}{Used in conjunction with \code{...} to support both explicit
+and implicit arguments.}
 }
 \description{
 Common parameters across routines
