@@ -26,7 +26,7 @@ Fixed description file for title case and single quotes.
 
 ```
 Non-standard file/directory found at top level:
-  ‘examples’
+  'examples'
 ```
 
 This is fixed by adding the folder to `.Rbuildignore`.
