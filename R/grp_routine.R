@@ -1,6 +1,6 @@
 #' Mutate a character/factor based on conditions.
 #'
-#' \code{ifelse_routine} functions like a serious of nested \code{ifelse} where
+#' \code{grp_routine} functions like a serious of nested \code{ifelse} where
 #' a series of conditions are evaluated and different values are assigned based
 #' on those conditions.
 #'
@@ -11,15 +11,15 @@
 #' @inheritParams ind_to_char
 #'
 #' @export
-#' @example /examples/ifelse_routine_ex.R
-ifelse_routine <- function(data, col, ..., ret_factor = FALSE) {
-  ifelse_routine_(data, col, .dots = lazyeval::lazy_dots(...),
+#' @example /examples/grp_routine_ex.R
+grp_routine <- function(data, col, ..., ret_factor = FALSE) {
+  grp_routine_(data, col, .dots = lazyeval::lazy_dots(...),
                   ret_factor = ret_factor)
 }
 
-#' @describeIn ifelse_routine SE version of ifelse_routine.
+#' @describeIn grp_routine SE version of grp_routine.
 #' @export
-ifelse_routine_ <- function(data, col, ..., .dots,
+grp_routine_ <- function(data, col, ..., .dots,
                             ret_factor = FALSE) {
   conds <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
 

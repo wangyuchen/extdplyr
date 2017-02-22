@@ -1,5 +1,8 @@
 `extdplyr` is an extension package for data manipulation based on `dplyr` and `tidyr`.
 
+[![Travis-CI Build Status](https://travis-ci.org/wangyuchen/extdplyr.svg?branch=master)](https://travis-ci.org/wangyuchen/extdplyr)
+
+
 If `dplyr` is a grammar for data manipulation, `extdplyr` is like a short paragraph written in `dplyr`. `extdplyr` extends `dplyr` and `tidyr` verbs to some common "routines" that manipulate datasets. It uses the same interface and preserves all features from `dplyr` like fast performance and various data sources.
 
 ### Motivation
@@ -7,3 +10,5 @@ If `dplyr` is a grammar for data manipulation, `extdplyr` is like a short paragr
 
 
 Also there are some cases where the operations don't comform to `dplyr`'s rules. Naturally one wouldn't expect these operations to be included into `dplyr`, but they can be implemented here for the occasional use.
+
+
