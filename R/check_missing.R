@@ -23,9 +23,9 @@ check_missing_ <- function(data, ..., .dots, ret_prop = TRUE) {
   vars <- dplyr::select_vars_(names(data), dots)
 
   if (ret_prop) {
-    fun <- dplyr::funs(sum(is.na(.)) / n())
+    fun <- dplyr::funs_(quote(sum(is.na(.)) / n()))
   } else {
-    fun <- dplyr::funs(sum(is.na(.)))
+    fun <- dplyr::funs_(quote(sum(is.na(.))))
   }
 
   dplyr::summarise_at(data, .cols = vars, .funs = fun)

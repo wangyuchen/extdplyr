@@ -24,10 +24,14 @@ options, see the \code{\link[dplyr]{select}} documentation.}
 
 \item{ret_factor}{Whether to convert the column into factor.}
 
+\item{remove}{If \code{TRUE}, remove input columns from output data frame.}
+
 \item{mutually_exclusive}{Check if the indicators are mutually exclusive.}
 
 \item{collectively_exhaustive}{Check if the indicators are collectively
 exhaustive.}
+
+\item{from}{Names of existing columns as character vector}
 }
 \description{
 This is the reverse operation of using \code{\link[stats]{model.matrix}} a

@@ -25,7 +25,7 @@ ifelse_routine_ <- function(data, col, ..., .dots,
 
   ret <- data %>%
     dplyr::transmute_(.dots = conds) %>%
-    ind_to_char_(col, names(.), ret_factor = ret_factor)
+    ind_to_char_(col, names(conds), ret_factor = ret_factor)
 
   dplyr::bind_cols(data, ret)
 }
@@ -41,6 +41,7 @@ ifelse_routine_ <- function(data, col, ..., .dots,
 #' the data.
 #'
 #' @inheritParams common_params
+#' @inheritParams tidyr::unite_
 #' @param ... Specification of indicator columns. Use bare variable names.
 #' Select all variables between \code{x} and \code{z} with \code{x:z}. For more
 #' options, see the \code{\link[dplyr]{select}} documentation.
@@ -73,7 +74,7 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
 
 
   int_df <- dplyr::mutate_all(data[from],
-                              dplyr::funs(as.integer(as.logical(.))))
+                              dplyr::funs_(quote(as.integer(as.logical(.)))))
 
   rs <- rowSums(int_df)
 
