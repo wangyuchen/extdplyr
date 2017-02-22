@@ -6,7 +6,7 @@ Authors@R: person("Yuchen", "Wang", email = "ycwang0712@gmail.com",
     role = c("aut", "cre"))
 Description: If `dplyr` is a grammar for data manipulation, `extdplyr` is like
     a short paragraph written in `dplyr`. `extdplyr` extends `dplyr` and
-    `tidyr` verbs to some common "routines" that manipulate datasets. It uses
+    `tidyr` verbs to some common "routines" that manipulate data sets. It uses
     the same interface and preserves all the features from `dplyr`, has good 
     performance, and supports various data sources.
 License: MIT + file LICENSE
