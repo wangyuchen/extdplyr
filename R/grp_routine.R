@@ -70,6 +70,7 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
   # check if it's indicator. Indicators should be integer 0 or 1.
   # According to coercion rule, logical - integer - double - character,
   # Here convert to logical first for safety.
+
   int_df <- data[from]
   int_df[] <- lapply(int_df, function(x) as.integer(as.logical(x)))
 
@@ -94,9 +95,14 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
 
   if (ret_factor) char_vec <- as.factor(char_vec)
 
-  ret <- dplyr::mutate_(data, .dots = named_expr(col, ~ char_vec))
+  first_col <- which(names(data) %in% from)[1]
+  ret <- append_col(data, char_vec, col, first_col - 1)
 
-  if (remove) ret <- dplyr::select(ret, -dplyr::one_of(from))
+  # Give back groups
+  if (dplyr::is.grouped_df(data))
+    ret <- dplyr::group_by_(ret, .dots = dplyr::groups(data))
+
+  if (remove) ret <- ret[setdiff(names(ret), from)]
 
   ret
 }
