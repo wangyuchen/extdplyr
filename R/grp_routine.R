@@ -19,15 +19,14 @@ grp_routine <- function(data, col, ..., ret_factor = FALSE) {
 
 #' @describeIn grp_routine SE version of grp_routine.
 #' @export
-grp_routine_ <- function(data, col, ..., .dots,
-                            ret_factor = FALSE) {
+grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE) {
   conds <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
 
-  ret <- data %>%
-    dplyr::transmute_(.dots = conds) %>%
-    ind_to_char_(col, names(conds), ret_factor = ret_factor)
-
-  dplyr::bind_cols(data, ret)
+  data %>%
+    dplyr::mutate_(.dots = conds) %>%
+    ind_to_char_(col, names(conds), ret_factor = ret_factor,
+                 remove = TRUE, mutually_exclusive = TRUE,
+                 collectively_exhaustive = TRUE)
 }
 
 
@@ -71,10 +70,8 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
   # check if it's indicator. Indicators should be integer 0 or 1.
   # According to coercion rule, logical - integer - double - character,
   # Here convert to logical first for safety.
-
-
-  int_df <- dplyr::mutate_all(data[from],
-                              dplyr::funs_(quote(as.integer(as.logical(.)))))
+  int_df <- data[from]
+  int_df[] <- lapply(int_df, function(x) as.integer(as.logical(x)))
 
   rs <- rowSums(int_df)
 
