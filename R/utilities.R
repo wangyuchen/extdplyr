@@ -25,3 +25,19 @@ check_se_column <- function(col_name) {
 common_params <- function(data, col, .dots) {
   NULL
 }
+
+
+# Adapted from tidyr
+append_df <- function (x, values, after = length(x)) {
+  y <- append(x, values, after = after)
+  class(y) <- class(x)
+  attr(y, "row.names") <- attr(x, "row.names")
+  y
+}
+
+append_col <- function (x, col, name, after = length(x)) {
+  name <- enc2utf8(name)
+  append_df(x, named_expr(name, col), after = after)
+}
+
+
