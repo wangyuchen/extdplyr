@@ -15,5 +15,5 @@ Maintainer: 'Yuchen Wang <ycwang0712@gmail.com>'
 Days since last update: 4
 ```
 
-I found a problem that could cause `ind_to_char_` to fail when data are grouped as a `grouped_df` object from `dplyr`. This has been fixed in the latest version, and several tests are added to make sure the functions work with various data structures.
+I'm sorry for the constant update. A problem was found that could cause `ind_to_char_` to fail when data are grouped as a `grouped_df` object from `dplyr`. This has been fixed in the latest version, and several tests are added to make sure the functions work with various data structures, including `tbl_df`, `grouped_df` and `data.table`.
 
