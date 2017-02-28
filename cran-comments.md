@@ -6,27 +6,14 @@
 ## R CMD check results
 There were no ERRORs or WARNINGs.
 
-win-builder check has 1 note:
+There was 1 NOTES on win-builder:
 
 ```
-New submission
+* checking CRAN incoming feasibility ... NOTE
+Maintainer: 'Yuchen Wang <ycwang0712@gmail.com>'
+
+Days since last update: 4
 ```
 
+I'm sorry for the constant update. A problem was found that could cause `ind_to_char_` to fail when data are grouped as a `grouped_df` object from `dplyr`. This has been fixed in the latest version, and several tests are added to make sure the functions work with various data structures, including `tbl_df`, `grouped_df` and `data.table`.
 
-Fixed 2 notes in previous submission.
-
-```
-Possibly mis-spelled words in DESCRIPTION:
-   dplyr (3:45, 7:18, 8:35, 8:63, 10:61)
-   extdplyr (7:62, 8:44)
-   tidyr (3:55, 9:6)
-```
-
-Fixed description file for title case and single quotes. 
-
-```
-Non-standard file/directory found at top level:
-  'examples'
-```
-
-This is fixed by adding the folder to `.Rbuildignore`.
