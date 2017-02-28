@@ -1,7 +1,7 @@
 Package: extdplyr
 Type: Package
-Title: Data Manipulation Extensions of 'Dplyr' and 'Tidyr'
-Version: 0.1.4
+Title: Data Manipulation Extensions of 'dplyr' and 'tidyr'
+Version: 0.1.4.9000
 Authors@R: person("Yuchen", "Wang", email = "ycwang0712@gmail.com",
     role = c("aut", "cre"))
 Description: If 'dplyr' is a grammar for data manipulation, 'extdplyr' is like
