@@ -88,26 +88,28 @@ test_that("ind_to_char_ works with grouped_df, tbl_df, tbl, data.frame", {
 })
 
 
-library(data.table)
-test_that("ind_to_char_ works with tbl_df, tbl, data.frame", {
-  df <- data.frame(x = 1:5, y = factor(c(letters[1:5])))
-  ind_df <- data.table(model.matrix(~ x + y - 1, df))
+if (requireNamespace("data.table", quietly = TRUE)) {
+  test_that("ind_to_char_ works with tbl_df, tbl, data.frame", {
+    df <- data.frame(x = 1:5, y = factor(c(letters[1:5])))
+    ind_df <- data.table::data.table(model.matrix(~ x + y - 1, df))
 
-  # Using SE
-  df_ret <- ind_to_char_(ind_df, col = "new_y",
-                         from = c("ya", "yb", "yc", "yd", "ye"))
+    # Using SE
+    df_ret <- ind_to_char_(ind_df, col = "new_y",
+                           from = c("ya", "yb", "yc", "yd", "ye"))
 
-  expect_equal(class(ind_df), class(df_ret))
-  expect_equal(ncol(df_ret), 2)
-  expect_equal(df_ret[['new_y']], c("ya", "yb", "yc", "yd", "ye"))
+    expect_equal(class(ind_df), class(df_ret))
+    expect_equal(ncol(df_ret), 2)
+    expect_equal(df_ret[['new_y']], c("ya", "yb", "yc", "yd", "ye"))
 
-  df_ret2 <- ind_to_char_(ind_df, col = "new_y",
-                          from = c("ya", "yb", "yc", "yd", "ye"),
-                          remove = FALSE)
+    df_ret2 <- ind_to_char_(ind_df, col = "new_y",
+                            from = c("ya", "yb", "yc", "yd", "ye"),
+                            remove = FALSE)
 
-  expect_equal(class(ind_df), class(df_ret2))
-  expect_equal(ncol(df_ret2), 7)
-  expect_equal(df_ret2[["new_y"]], c("ya", "yb", "yc", "yd", "ye"))
-})
+    expect_equal(class(ind_df), class(df_ret2))
+    expect_equal(ncol(df_ret2), 7)
+    expect_equal(df_ret2[["new_y"]], c("ya", "yb", "yc", "yd", "ye"))
+  })
+}
+
 
 
