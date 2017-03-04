@@ -40,4 +40,16 @@ append_col <- function (x, col, name, after = length(x)) {
   append_df(x, named_expr(name, col), after = after)
 }
 
+col_name <- function (x, default = stop("Please supply column name",
+                                        call. = FALSE)) {
+  if (is.character(x))
+    return(x)
+  if (identical(x, quote(expr = )))
+    return(default)
+  if (is.name(x))
+    return(as.character(x))
+  if (is.null(x))
+    return(x)
+  stop("Invalid column specification", call. = FALSE)
+}
 
