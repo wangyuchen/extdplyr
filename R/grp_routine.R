@@ -90,10 +90,9 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
     }
   }
 
+  char_vec <- unname(from)[as.matrix(int_df) %*% seq_along(from)]
 
-  char_vec <- from[as.matrix(int_df) %*% seq_along(from)]
-
-  if (ret_factor) char_vec <- as.factor(char_vec)
+  if (ret_factor) char_vec <- factor(char_vec, levels = from)
 
   first_col <- which(names(data) %in% from)[1]
   ret <- append_col(data, char_vec, col, first_col - 1)
