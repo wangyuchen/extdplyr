@@ -86,7 +86,8 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
 
   if (collectively_exhaustive) {
     if (any(rs < 1, na.rm = TRUE)) {
-      int_df[rs < 1, ] <- NA_integer_
+      # missing or no indicator
+      int_df[is.na(rs) | (!is.na(rs) & rs < 1), ] <- NA_integer_
       warning("Indicators are not collectively exhaustive, NAs introduced.")
     }
   }
