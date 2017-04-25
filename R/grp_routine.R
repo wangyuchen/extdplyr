@@ -12,21 +12,25 @@
 #'
 #' @export
 #' @example /examples/grp_routine_ex.R
-grp_routine <- function(data, col, ..., ret_factor = FALSE) {
+grp_routine <- function(data, col, ..., ret_factor = FALSE,
+                        missing_as_false = FALSE) {
   col <- col_name(substitute(col))
   grp_routine_(data, col, .dots = lazyeval::lazy_dots(...),
-                  ret_factor = ret_factor)
+                  ret_factor = ret_factor, missing_as_false = missing_as_false)
 }
 
 #' @describeIn grp_routine SE version of grp_routine.
 #' @export
-grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE) {
+grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE,
+                         missing_as_false = FALSE) {
   conds <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
 
   data %>%
     dplyr::mutate_(.dots = conds) %>%
     ind_to_char_(col, names(conds), ret_factor = ret_factor,
-                 remove = TRUE, mutually_exclusive = TRUE,
+                 remove = TRUE,
+                 missing_as_false = missing_as_false,
+                 mutually_exclusive = TRUE,
                  collectively_exhaustive = TRUE)
 }
 
@@ -36,7 +40,7 @@ grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE) {
 #' Convert indicator data.frame to character/factor.
 #'
 #' This is the reverse operation of using \code{\link[stats]{model.matrix}} a
-#' factor. \code{ind_to_char} works like \code{dplyr::unite}, it combines
+#' factor. \code{ind_to_char} works like \code{tidyr::unite}, it combines
 #' multiple indicator columns into one character/factor column and add it to
 #' the data.
 #'
@@ -54,11 +58,13 @@ grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE) {
 #'
 #' @export
 ind_to_char <- function(data, col, ..., ret_factor = FALSE, remove = TRUE,
+                        missing_as_false = FALSE,
                         mutually_exclusive = TRUE,
                         collectively_exhaustive = TRUE) {
   col <- col_name(substitute(col))
   from <- dplyr::select_vars(colnames(data), ...)
   ind_to_char_(data, col, from, ret_factor = ret_factor, remove = remove,
+               missing_as_false = missing_as_false,
                mutually_exclusive = mutually_exclusive,
                collectively_exhaustive = collectively_exhaustive)
 }
@@ -66,6 +72,7 @@ ind_to_char <- function(data, col, ..., ret_factor = FALSE, remove = TRUE,
 #' @describeIn ind_to_char SE version of \code{ind_to_char}.
 #' @export
 ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
+                         missing_as_false = FALSE,
                          mutually_exclusive = TRUE,
                          collectively_exhaustive = TRUE) {
   # check if it's indicator. Indicators should be integer 0 or 1.
@@ -73,9 +80,19 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
   # Here convert to logical first for safety.
 
   int_df <- data[from]
-  int_df[] <- lapply(int_df, function(x) as.integer(as.logical(x)))
+  int_df[] <- lapply(int_df, function(x) {
+    as.integer(as.logical(x) & (!missing_as_false | !is.na(x)))
+  })
 
   rs <- rowSums(int_df)
+
+  if (!missing_as_false & anyNA(rs)) {
+    # TODO: work on settings to separete ind_to_char and grp_routine
+    stop(paste("Indicators contain missing values.",
+               "To allow missing values in conditions,",
+               "set missing_as_false = TRUE, \n",
+               "or use !is.na to explicitly exclude them in conditions."))
+  }
 
   if (mutually_exclusive) {
    if (any(rs > 1, na.rm = TRUE)) {
