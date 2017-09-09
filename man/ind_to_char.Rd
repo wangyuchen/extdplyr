@@ -27,6 +27,8 @@ exhaustive.}
 
 \item{remove}{If \code{TRUE}, remove input column from output data frame.}
 
+\item{na_as_false}{Treat NAs as FALSE in indicators columns.}
+
 \item{from}{Names of existing columns as character vector}
 }
 \description{
@@ -47,10 +49,6 @@ truth_table$IND <- c("Error", "Q", NA, "P", NA, NA, NA, NA, NA)
 truth_table$IND_na_as_false <-
   c("Error", "Q", "Q", "P", NA, NA, "P", NA, NA)
 truth_table
-
-truth_table \%>\% slice(-1) \%>\%
-  ind_to_char(IND2, P, Q, remove = FALSE) \%>\%
-  ind_to_char(IND2_na, P, Q, na_as_false = TRUE, remove = FALSE)
 
 
 # Supports converting the following atomic types to indicator

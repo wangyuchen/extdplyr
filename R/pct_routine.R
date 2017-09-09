@@ -85,7 +85,7 @@ tally_pct_ <- function(data, wt = NULL, ret_name = "pct",
   data_groups <- dplyr::groups(data)
   dplyr::summarise_(data, .dots = named_expr(ret_name, expr)) %>%
     dplyr::filter_(rebase_expr) %>%
-    dplyr::group_by_(.dots = head(data_groups, -margin)) %>%
+    dplyr::group_by_(.dots = utils::head(data_groups, -margin)) %>%
     dplyr::mutate_(.dots = named_expr(ret_name,
                                       interp(quote(var / sum(var)),
                                              var = as.name(ret_name))))

@@ -5,10 +5,6 @@ truth_table$IND_na_as_false <-
   c("Error", "Q", "Q", "P", NA, NA, "P", NA, NA)
 truth_table
 
-truth_table %>% slice(-1) %>%
-  ind_to_char(IND2, P, Q, remove = FALSE) %>%
-  ind_to_char(IND2_na, P, Q, na_as_false = TRUE, remove = FALSE)
-
 
 # Supports converting the following atomic types to indicator
 df <- data.frame(integer_ind = c(2L, 0L, 0L, 0L, 0L, 0L, 0L),

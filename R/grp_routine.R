@@ -49,6 +49,7 @@ grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE,
 #' options, see the \code{\link[dplyr]{select}} documentation.
 #' @param ret_factor Whether to convert the column into factor.
 #' exhaustive.
+#' @param na_as_false Treat NAs as FALSE in indicators columns.
 #'
 #' @example examples/ind_to_char_ex.R
 #'
@@ -111,7 +112,11 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
   ret
 }
 
-
+#' Convert Vectors to Indicators
+#'
+#' @param x Vector to be converted
+#' @param convert_na Whether NAs should be converted to FALSE.
+#' @param ... Specific arguments passed to methods.
 #' @export
 as_indicator <- function(x, convert_na = FALSE, ...) {
   # Indicator is an integer vector with only 0 and 1 as entries.
@@ -122,7 +127,7 @@ as_indicator <- function(x, convert_na = FALSE, ...) {
 }
 
 #' @export
-as_indicator.default <- function(x, convert_na = FALSE) {
+as_indicator.default <- function(x, convert_na = FALSE, ...) {
   # convert_na is a switch to add !is.na(x)
   as.integer((!convert_na | !is.na(x)) & as.logical(x))
 }
