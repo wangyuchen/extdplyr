@@ -6,10 +6,10 @@
 \title{Convert indicator data.frame to character/factor.}
 \usage{
 ind_to_char(data, col, ..., ret_factor = FALSE, remove = TRUE,
-  mutually_exclusive = TRUE, collectively_exhaustive = TRUE)
+  na_as_false = FALSE)
 
 ind_to_char_(data, col, from, ret_factor = FALSE, remove = TRUE,
-  mutually_exclusive = TRUE, collectively_exhaustive = TRUE)
+  na_as_false = FALSE)
 }
 \arguments{
 \item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
@@ -22,20 +22,16 @@ that end with underscores).}
 Select all variables between \code{x} and \code{z} with \code{x:z}. For more
 options, see the \code{\link[dplyr]{select}} documentation.}
 
-\item{ret_factor}{Whether to convert the column into factor.}
-
-\item{remove}{If \code{TRUE}, remove input columns from output data frame.}
-
-\item{mutually_exclusive}{Check if the indicators are mutually exclusive.}
-
-\item{collectively_exhaustive}{Check if the indicators are collectively
+\item{ret_factor}{Whether to convert the column into factor.
 exhaustive.}
+
+\item{remove}{If \code{TRUE}, remove input column from output data frame.}
 
 \item{from}{Names of existing columns as character vector}
 }
 \description{
-This is the reverse operation of using \code{\link[stats]{model.matrix}} a
-factor. \code{ind_to_char} works like \code{dplyr::unite}, it combines
+This is the reverse operation of using \code{\link[stats]{model.matrix}} on a
+factor. \code{ind_to_char} works like \code{tidyr::unite}, it combines
 multiple indicator columns into one character/factor column and add it to
 the data.
 }
@@ -45,19 +41,32 @@ the data.
 }}
 
 \examples{
-# Supports converting the following atomic types to indicator
+# Truth table used by ind_to_char
+truth_table <- expand.grid(P = c(TRUE, FALSE, NA), Q = c(TRUE, FALSE, NA))
+truth_table$IND <- c("Error", "Q", NA, "P", NA, NA, NA, NA, NA)
+truth_table$IND_na_as_false <-
+  c("Error", "Q", "Q", "P", NA, NA, "P", NA, NA)
+truth_table
 
-df <- data.frame(integer_ind = c(2L, 0L, 0L, 0L, 0L, 0L),
+truth_table \%>\% slice(-1) \%>\%
+  ind_to_char(IND2, P, Q, remove = FALSE) \%>\%
+  ind_to_char(IND2_na, P, Q, na_as_false = TRUE, remove = FALSE)
+
+
+# Supports converting the following atomic types to indicator
+df <- data.frame(integer_ind = c(2L, 0L, 0L, 0L, 0L, 0L, 0L),
                  # non-zero integer is 1, otherwise 0.
-                 logcal_ind = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE),
+                 logcal_ind = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
                  # TRUE is 1.
-                 double_ind = c(0, 0, 2.0, 0, 0, 0),
+                 double_ind = c(0, 0, 2.0, 0, 0, 0, 0),
                  # non-zero double is 1.
-                 char_ind = c("FALSE", "FALSE", "F", "TRUE", "T", "FALSE"),
+                 char_ind = c("FALSE", "FALSE", "F", "TRUE", "T", "F", "F"),
                  # "T" and "TRUE" converts to 1.
-                 factor_ind = factor(c(1, 1, 1, 1, 1, 0), levels = c(0, 1),
+                 factor_ind = factor(c(1, 1, 1, 1, 1, 0, 1), levels = c(0, 1),
                                      labels = c(TRUE, FALSE)),
-                 # Factors are converted based on levels.
+                 # Factors are converted on levels, see as.logical.factor()
+                 # Note that here 0 = TRUE, 1 = FALSE, but 0 is converted to
+                 # logical TRUE.
                  stringsAsFactors = FALSE)
 
 ind_to_char_(df, col = "new_y", from = names(df), remove = FALSE)
@@ -70,9 +79,9 @@ ind_df <- as.data.frame(model.matrix(~ x + y - 1,
 ind_df  # an indicator matrix with NAs
 
 # New character column is generated with non-selected columns kept as is.
+ind_to_char(ind_df, new_y, ya:ye, remove = FALSE)
 ind_to_char(ind_df, new_y, ya:ye)
 ind_to_char(ind_df, new_y, -x)
-ind_to_char(ind_df, col = new_y, ya:ye, remove = FALSE)
 # Returns a factor column
 ind_to_char(ind_df, col = new_y, ya:ye, ret_factor = TRUE)
 

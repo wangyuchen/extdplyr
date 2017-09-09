@@ -23,7 +23,7 @@ tally_pct_(data, wt = NULL, ret_name = "pct", margin = 1,
 
 \item{...}{Variables to group by, see \code{\link[dplyr]{group_by}}.}
 
-\item{wt}{Bare or quoted (using \code{quote()}) column name of weights.}
+\item{wt}{Bare or quoted column name of weights, see examples for details.}
 
 \item{ret_name}{Character of the variable name returned.}
 
@@ -58,6 +58,11 @@ data(esoph)
 esoph
 pct_routine(esoph, agegp, alcgp)
 pct_routine(esoph, agegp, alcgp, wt = ncases)
+
+# Use SE
+pct_routine_(esoph, c("agegp", "alcgp"), wt = quote(ncases))
+pct_routine_(esoph, c("agegp", "alcgp"), wt = "ncases")
+
 # Calculate one level up
 pct_routine(esoph, agegp, alcgp, margin = 2)
 # Crate new grouping variables

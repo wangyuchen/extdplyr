@@ -5,9 +5,9 @@
 \alias{grp_routine_}
 \title{Mutate a character/factor based on conditions.}
 \usage{
-grp_routine(data, col, ..., ret_factor = FALSE)
+grp_routine(data, col, ..., ret_factor = FALSE, na_as_false = FALSE)
 
-grp_routine_(data, col, ..., .dots, ret_factor = FALSE)
+grp_routine_(data, col, ..., .dots, ret_factor = FALSE, na_as_false = FALSE)
 }
 \arguments{
 \item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
@@ -19,7 +19,8 @@ that end with underscores).}
 \item{...}{Specification of group assignment. Use named conditions, like
 \code{top2 = x > 5}.}
 
-\item{ret_factor}{Whether to convert the column into factor.}
+\item{ret_factor}{Whether to convert the column into factor.
+exhaustive.}
 
 \item{.dots}{Used in conjunction with \code{...} to support both explicit
 and implicit arguments.}
@@ -39,21 +40,36 @@ df <- data.frame(v1 = letters[1:5], v2 = 1:5)
 df
 
 # By default, it creates new groups
-grp_routine(df, "group",
-               first = v1 \%in\% c("a", "b"),
-               second = v2 == 3,
-               third = v2 >= 4)
+grp_routine(df, group,
+            first = v1 \%in\% c("a", "b"),
+            second = v2 == 3,
+            third = v2 >= 4)
 
 # Gives a warning when the groups are not collectively exhaustive
-grp_routine(df, "group",
-               first = v1 \%in\% c("a", "b"),
-               second = v2 == 3,
-               third = v2 > 4)
+grp_routine(df, group,
+            first = v1 \%in\% c("a", "b"),
+            second = v2 == 3,
+            third = v2 > 4)
 
+# stops when conditions overlap so groups are not mutually exclusive
+grp_routine(df, group,
+            first = v1 \%in\% c("a", "b"),
+            second = v2 == 3,
+            third = v2 >= 3)
 
 # SE version
 grp_routine_(df, "group",
-               "first" = ~ v1 \%in\% c("a", "b"),
-               "second" = ~ v2 == 3,
-               .dots = setNames(list(~ v2 > 4), "third"))
+             "first" = ~ v1 \%in\% c("a", "b"),
+             "second" = ~ v2 == 3,
+             .dots = setNames(list(~ v2 > 4), "third"))
+
+
+# Missing values in conditions are treated with missing_as_false = TRUE
+df <- data.frame(v1 = c(letters[1:4], NA))
+df
+
+grp_routine(df, group,
+            first = v1 == "a",
+            second = v1 != "a",
+            na_as_false = TRUE)
 }

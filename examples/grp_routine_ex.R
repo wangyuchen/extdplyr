@@ -33,4 +33,4 @@ df
 grp_routine(df, group,
             first = v1 == "a",
             second = v1 != "a",
-            missing_as_false = FALSE)
+            na_as_false = TRUE)
