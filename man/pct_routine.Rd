@@ -7,24 +7,28 @@
 \alias{tally_pct_}
 \title{Calculate percentage by group.}
 \usage{
-pct_routine(data, ..., wt = NULL, ret_name = "pct", rebase = FALSE,
-  ungroup = FALSE)
+pct_routine(data, ..., wt = NULL, ret_name = "pct", margin = 1,
+  rebase = FALSE, ungroup = FALSE)
 
-pct_routine_(data, vars, wt = NULL, ret_name = "pct", rebase = FALSE,
-  ungroup = FALSE)
+pct_routine_(data, vars, wt = NULL, ret_name = "pct", margin = 1,
+  rebase = FALSE, ungroup = FALSE)
 
-tally_pct(data, wt = NULL, ret_name = "pct", rebase = FALSE)
+tally_pct(data, wt = NULL, ret_name = "pct", margin = 1, rebase = FALSE)
 
-tally_pct_(data, wt = NULL, ret_name = "pct", rebase = FALSE)
+tally_pct_(data, wt = NULL, ret_name = "pct", margin = 1,
+  rebase = FALSE)
 }
 \arguments{
 \item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
 
 \item{...}{Variables to group by, see \code{\link[dplyr]{group_by}}.}
 
-\item{wt}{Column name of weights.}
+\item{wt}{Bare or quoted column name of weights, see examples for details.}
 
 \item{ret_name}{Character of the variable name returned.}
+
+\item{margin}{Margin to calculate percentage for. This is like the margin in
+\code{\link[base]{prop.table}}.}
 
 \item{rebase}{Whether to remove the missing values in the percentage, e.g.
 rebase the percentage so that NAs in the last group are excluded.}
@@ -54,6 +58,13 @@ data(esoph)
 esoph
 pct_routine(esoph, agegp, alcgp)
 pct_routine(esoph, agegp, alcgp, wt = ncases)
+
+# Use SE
+pct_routine_(esoph, c("agegp", "alcgp"), wt = quote(ncases))
+pct_routine_(esoph, c("agegp", "alcgp"), wt = "ncases")
+
+# Calculate one level up
+pct_routine(esoph, agegp, alcgp, margin = 2)
 # Crate new grouping variables
 pct_routine(esoph, agegp, low_alcgp = alcgp \%in\% c("0-39g/day", "40-79"))
 

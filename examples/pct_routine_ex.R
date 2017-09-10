@@ -2,6 +2,13 @@ data(esoph)
 esoph
 pct_routine(esoph, agegp, alcgp)
 pct_routine(esoph, agegp, alcgp, wt = ncases)
+
+# Use SE
+pct_routine_(esoph, c("agegp", "alcgp"), wt = quote(ncases))
+pct_routine_(esoph, c("agegp", "alcgp"), wt = "ncases")
+
+# Calculate one level up
+pct_routine(esoph, agegp, alcgp, margin = 2)
 # Crate new grouping variables
 pct_routine(esoph, agegp, low_alcgp = alcgp %in% c("0-39g/day", "40-79"))
 
