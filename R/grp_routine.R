@@ -1,55 +1,51 @@
 #' Mutate a character/factor based on conditions.
 #'
 #' \code{grp_routine} functions like a serious of nested \code{ifelse} where
-#' a series of conditions are evaluated and different values are assigned based
-#' on those conditions.
+#' a series of conditions are evaluated and groups are assigned based on those
+#' conditions.
 #'
 #'
-#' @inheritParams common_params
-#' @param ... Specification of group assignment. Use named conditions, like
-#' \code{top2 = x > 5}.
+#' @param ... Name-value pairs of expressions for group assignment. The values
+#' are logical predicates defined in terms of variables in \code{data}. The rows
+#' with the condition evaluated to \code{TRUE} are assigned to that group.
 #' @inheritParams ind_to_char
 #'
 #' @export
 #' @example /examples/grp_routine_ex.R
-grp_routine <- function(data, col, ..., ret_factor = FALSE,
-                        na_as_false = FALSE) {
-  col <- col_name(substitute(col))
-  grp_routine_(data, col, .dots = lazyeval::lazy_dots(...),
-               ret_factor = ret_factor, na_as_false = na_as_false)
+grp_routine <- function(data, col, ...,  na_as_false = FALSE,
+                        ret_factor = FALSE) {
+  UseMethod("grp_routine")
 }
 
-#' @describeIn grp_routine SE version of grp_routine.
+#' @describeIn grp_routine Method for data.frame.
 #' @export
-grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE,
-                         na_as_false = FALSE) {
-  conds <- lazyeval::all_dots(.dots, ..., all_named = TRUE)
+grp_routine.data.frame <- function(data, col, ...,  na_as_false = FALSE,
+                                   ret_factor = FALSE) {
+
+  col_name <- rlang::quo_name(enquo(col))
+  vars <- rlang::exprs_auto_name(quos(...), printer = rlang::quo_text)
 
   data %>%
-    dplyr::mutate_(.dots = conds) %>%
-    ind_to_char_(col, names(conds), ret_factor = ret_factor,
-                 remove = TRUE,
-                 na_as_false = na_as_false)
+    dplyr::mutate(UQS(vars)) %>%
+    ind_to_char(UQ(col_name), UQS(names(vars)), na_as_false = na_as_false,
+                ret_factor = ret_factor, remove = TRUE)
 }
 
 
 
-
-#' Convert indicator data.frame to character/factor.
+#' Convert indicator columns to single character/factor.
 #'
 #' This is the reverse operation of using \code{\link[stats]{model.matrix}} on a
 #' factor. \code{ind_to_char} works like \code{tidyr::unite}, it combines
 #' multiple indicator columns into one character/factor column and add it to
 #' the data.
 #'
-#' @inheritParams common_params
-#' @inheritParams tidyr::unite_
-#' @param ... Specification of indicator columns. Use bare variable names.
-#' Select all variables between \code{x} and \code{z} with \code{x:z}. For more
-#' options, see the \code{\link[dplyr]{select}} documentation.
+#' @inheritParams tidyr::unite
+#' @param ... A selection of columns. If empty, all variables are selected. See
+#' \code{\link[dplyr]{select}} for details.
+#' @param na_as_false Treat NAs as FALSE in indicators columns.
 #' @param ret_factor Whether to convert the column into factor.
 #' exhaustive.
-#' @param na_as_false Treat NAs as FALSE in indicators columns.
 #'
 #' @example examples/ind_to_char_ex.R
 #'
@@ -64,10 +60,18 @@ ind_to_char <- function(data, col, ..., na_as_false = FALSE,
 ind_to_char.data.frame <- function(data, col, ..., na_as_false = FALSE,
                                    ret_factor = FALSE, remove = TRUE) {
   col_name <- rlang::quo_name(enquo(col))
-  vars <- quos(...)
-  vars <- lapply(vars, rlang::env_bury, UQS(helpers))
+  vars <- lapply(quos(...), rlang::env_bury,
+                 UQS(tidyselect::vars_select_helpers))
 
-  from_vars <- tidyselect::vars_select(colnames(data), UQS(vars))
+  if (rlang::is_empty(vars)) {
+    from_vars <- colnames(data)
+  } else {
+    from_vars <- unname(tidyselect::vars_select(colnames(data), UQS(vars)))
+  }
+
+  if (rlang::is_empty(from_vars)) {
+    return(data)
+  }
 
   ind_df <- data[from_vars]
   ind_df[] <- lapply(ind_df, as_indicator, convert_na = na_as_false)
@@ -84,19 +88,16 @@ ind_to_char.data.frame <- function(data, col, ..., na_as_false = FALSE,
     # This checks any partial NA in one row. All NA is allowed.
     # If na_as_false = TRUE, all NAs will be converted to FALSE so this won't
     # be activated.
-
-    # TODO: work on settings to separete ind_to_char and grp_routine
     warning(paste("Some indicators contain missing values.",
-                  "To allow missing values as FALSE in indicators,",
-                  "set na_as_false = TRUE,",
-                  "or use !is.na() to explicitly exclude them in conditions."))
+                  "To allow missing values in indicators,",
+                  "set na_as_false = TRUE."))
   }
 
   # There should only be 1s or NAs in rs. 0s need to be converted to NA
   ind_df[is.na(rs) | (!is.na(rs) & rs < 1), ] <- NA_integer_
 
 
-  char_vec <- unname(from_vars)[as.matrix(ind_df) %*% seq_along(from_vars)]
+  char_vec <- from_vars[as.matrix(ind_df) %*% seq_along(from_vars)]
 
   if (ret_factor) char_vec <- factor(char_vec, levels = from_vars)
 
@@ -128,6 +129,8 @@ ind_to_char.grouped_df <- function(data, col, ..., na_as_false = FALSE,
   dplyr::group_by(ret, UQS(dplyr::groups(data)), add = TRUE)
 }
 
+#' @param from SE version of \code{...}. Provided for backward compatibility.
+#' @rdname ind_to_char
 #' @export
 ind_to_char_ <- function(data, col, from, na_as_false = FALSE,
                          ret_factor = FALSE, remove = TRUE) {
@@ -135,6 +138,7 @@ ind_to_char_ <- function(data, col, from, na_as_false = FALSE,
 }
 
 
+#' @rdname ind_to_char
 #' @export
 ind_to_char_.data.frame <- function(data, col, from, na_as_false = FALSE,
                                     ret_factor = FALSE, remove = TRUE) {

@@ -7,11 +7,12 @@ grp_routine(df, group,
             second = v2 == 3,
             third = v2 >= 4)
 
-# Gives a warning when the groups are not collectively exhaustive
+# Un-named conditions are auto named
 grp_routine(df, group,
-            first = v1 %in% c("a", "b"),
-            second = v2 == 3,
-            third = v2 > 4)
+            v1 %in% c("a", "b"),
+            v2 == 3,
+            v2 >= 4)
+
 
 \dontrun{
 # stops when conditions overlap so groups are not mutually exclusive
@@ -21,17 +22,23 @@ grp_routine(df, group,
             third = v2 >= 3)
 }
 
-# SE version
-grp_routine_(df, "group",
-             "first" = ~ v1 %in% c("a", "b"),
-             "second" = ~ v2 == 3,
-             .dots = setNames(list(~ v2 > 4), "third"))
+# arguments work with standard evaluation
+grp_routine(df, "group",
+            "first" = v1 %in% c("a", "b"),
+            "second" = v2 == 3,
+            "third" = v2 >= 4)
 
-# Missing values in conditions are treated with missing_as_false = TRUE
-df <- data.frame(v1 = c(letters[1:4], NA))
+# Missing values in conditions are treated with na_as_false = TRUE
+df$v2 <- c(1:4, NA)
 df
 
 grp_routine(df, group,
-            first = v1 == "a",
-            second = v1 != "a",
+            first = v1 %in% c("a", "b"),
+            second = v2 == 3,
+            third = v1 == "e" | v2 >= 4)
+
+grp_routine(df, group,
+            first = v1 %in% c("a", "b"),
+            second = v2 == 3,
+            third = v1 == "e" | v2 >= 4,
             na_as_false = TRUE)

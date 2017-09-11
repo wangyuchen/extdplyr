@@ -4,7 +4,9 @@
 \alias{ind_to_char}
 \alias{ind_to_char.data.frame}
 \alias{ind_to_char.grouped_df}
-\title{Convert indicator data.frame to character/factor.}
+\alias{ind_to_char_}
+\alias{ind_to_char_.data.frame}
+\title{Convert indicator columns to single character/factor.}
 \usage{
 ind_to_char(data, col, ..., na_as_false = FALSE, ret_factor = FALSE,
   remove = TRUE)
@@ -14,24 +16,36 @@ ind_to_char(data, col, ..., na_as_false = FALSE, ret_factor = FALSE,
 
 \method{ind_to_char}{grouped_df}(data, col, ..., na_as_false = FALSE,
   ret_factor = FALSE, remove = TRUE)
+
+ind_to_char_(data, col, from, na_as_false = FALSE, ret_factor = FALSE,
+  remove = TRUE)
+
+\method{ind_to_char_}{data.frame}(data, col, from, na_as_false = FALSE,
+  ret_factor = FALSE, remove = TRUE)
 }
 \arguments{
-\item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
+\item{data}{A data frame.}
 
-\item{col}{Name of the generated column. Use a bare name when using NSE
-functions and a character (quoted) name when using SE functions (functions
-that end with underscores).}
+\item{col}{The name of the new column, as a string or symbol.
 
-\item{...}{Specification of indicator columns. Use bare variable names.
-Select all variables between \code{x} and \code{z} with \code{x:z}. For more
-options, see the \code{\link[dplyr]{select}} documentation.}
+This argument is passed by expression and supports
+\link[rlang:quasiquotation]{quasiquotation} (you can unquote strings
+and symbols). The name is captured from the expression with
+\code{\link[rlang:quo_name]{rlang::quo_name()}} (note that this kind of interface where
+symbols do not represent actual objects is now discouraged in the
+tidyverse; we support it here for backward compatibility).}
+
+\item{...}{A selection of columns. If empty, all variables are selected. See
+\code{\link[dplyr]{select}} for details.}
 
 \item{na_as_false}{Treat NAs as FALSE in indicators columns.}
 
 \item{ret_factor}{Whether to convert the column into factor.
 exhaustive.}
 
-\item{remove}{If \code{TRUE}, remove input column from output data frame.}
+\item{remove}{If \code{TRUE}, remove input columns from output data frame.}
+
+\item{from}{SE version of \code{...}. Provided for backward compatibility.}
 }
 \description{
 This is the reverse operation of using \code{\link[stats]{model.matrix}} on a
@@ -72,8 +86,7 @@ df <- data.frame(integer_ind = c(2L, 0L, 0L, 0L, 0L, 0L, 0L),
                  stringsAsFactors = FALSE)
 
 # Keep original columns with remove = FALSE
-ind_to_char(df, col = new_y, integer_ind, logical_ind, double_ind,
-            char_ind, factor_ind, remove = FALSE)
+ind_to_char(df, col = new_y, remove = FALSE)
 
 
 

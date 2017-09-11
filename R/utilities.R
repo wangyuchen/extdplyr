@@ -11,8 +11,6 @@ check_se_column <- function(col_name) {
   stopifnot(as.character(col_name), length(col) == 1)
 }
 
-
-
 #' Common parameters across routines
 #'
 #' @param data A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.
@@ -25,9 +23,6 @@ check_se_column <- function(col_name) {
 common_params <- function(data, col, .dots) {
   NULL
 }
-
-
-
 
 col_name <- function (x, default = stop("Please supply column name",
                                         call. = FALSE)) {

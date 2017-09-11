@@ -23,8 +23,7 @@ df <- data.frame(integer_ind = c(2L, 0L, 0L, 0L, 0L, 0L, 0L),
                  stringsAsFactors = FALSE)
 
 # Keep original columns with remove = FALSE
-ind_to_char(df, col = new_y, integer_ind, logical_ind, double_ind,
-            char_ind, factor_ind, remove = FALSE)
+ind_to_char(df, col = new_y, remove = FALSE)
 
 
 

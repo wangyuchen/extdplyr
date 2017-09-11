@@ -2,39 +2,43 @@
 % Please edit documentation in R/grp_routine.R
 \name{grp_routine}
 \alias{grp_routine}
-\alias{grp_routine_}
+\alias{grp_routine.data.frame}
 \title{Mutate a character/factor based on conditions.}
 \usage{
-grp_routine(data, col, ..., ret_factor = FALSE, na_as_false = FALSE)
+grp_routine(data, col, ..., na_as_false = FALSE, ret_factor = FALSE)
 
-grp_routine_(data, col, ..., .dots, ret_factor = FALSE, na_as_false = FALSE)
+\method{grp_routine}{data.frame}(data, col, ..., na_as_false = FALSE,
+  ret_factor = FALSE)
 }
 \arguments{
-\item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
+\item{data}{A data frame.}
 
-\item{col}{Name of the generated column. Use a bare name when using NSE
-functions and a character (quoted) name when using SE functions (functions
-that end with underscores).}
+\item{col}{The name of the new column, as a string or symbol.
 
-\item{...}{Specification of group assignment. Use named conditions, like
-\code{top2 = x > 5}.}
+This argument is passed by expression and supports
+\link[rlang:quasiquotation]{quasiquotation} (you can unquote strings
+and symbols). The name is captured from the expression with
+\code{\link[rlang:quo_name]{rlang::quo_name()}} (note that this kind of interface where
+symbols do not represent actual objects is now discouraged in the
+tidyverse; we support it here for backward compatibility).}
 
-\item{ret_factor}{Whether to convert the column into factor.
-exhaustive.}
+\item{...}{Name-value pairs of expressions for group assignment. The values
+are logical predicates defined in terms of variables in \code{data}. The rows
+with the condition evaluated to \code{TRUE} are assigned to that group.}
 
 \item{na_as_false}{Treat NAs as FALSE in indicators columns.}
 
-\item{.dots}{Used in conjunction with \code{...} to support both explicit
-and implicit arguments.}
+\item{ret_factor}{Whether to convert the column into factor.
+exhaustive.}
 }
 \description{
 \code{grp_routine} functions like a serious of nested \code{ifelse} where
-a series of conditions are evaluated and different values are assigned based
-on those conditions.
+a series of conditions are evaluated and groups are assigned based on those
+conditions.
 }
-\section{Functions}{
+\section{Methods (by class)}{
 \itemize{
-\item \code{grp_routine_}: SE version of grp_routine.
+\item \code{data.frame}: Method for data.frame.
 }}
 
 \examples{
@@ -47,11 +51,12 @@ grp_routine(df, group,
             second = v2 == 3,
             third = v2 >= 4)
 
-# Gives a warning when the groups are not collectively exhaustive
+# Un-named conditions are auto named
 grp_routine(df, group,
-            first = v1 \%in\% c("a", "b"),
-            second = v2 == 3,
-            third = v2 > 4)
+            v1 \%in\% c("a", "b"),
+            v2 == 3,
+            v2 >= 4)
+
 
 \dontrun{
 # stops when conditions overlap so groups are not mutually exclusive
@@ -61,18 +66,24 @@ grp_routine(df, group,
             third = v2 >= 3)
 }
 
-# SE version
-grp_routine_(df, "group",
-             "first" = ~ v1 \%in\% c("a", "b"),
-             "second" = ~ v2 == 3,
-             .dots = setNames(list(~ v2 > 4), "third"))
+# arguments work with standard evaluation
+grp_routine(df, "group",
+            "first" = v1 \%in\% c("a", "b"),
+            "second" = v2 == 3,
+            "third" = v2 >= 4)
 
-# Missing values in conditions are treated with missing_as_false = TRUE
-df <- data.frame(v1 = c(letters[1:4], NA))
+# Missing values in conditions are treated with na_as_false = TRUE
+df$v2 <- c(1:4, NA)
 df
 
 grp_routine(df, group,
-            first = v1 == "a",
-            second = v1 != "a",
+            first = v1 \%in\% c("a", "b"),
+            second = v2 == 3,
+            third = v1 == "e" | v2 >= 4)
+
+grp_routine(df, group,
+            first = v1 \%in\% c("a", "b"),
+            second = v2 == 3,
+            third = v1 == "e" | v2 >= 4,
             na_as_false = TRUE)
 }
