@@ -2,9 +2,12 @@
 % Please edit documentation in R/grp_routine.R
 \name{as_indicator}
 \alias{as_indicator}
+\alias{as_indicator.default}
 \title{Convert Vectors to Indicators}
 \usage{
 as_indicator(x, convert_na = FALSE, ...)
+
+\method{as_indicator}{default}(x, convert_na = FALSE, ...)
 }
 \arguments{
 \item{x}{Vector to be converted}
@@ -14,5 +17,13 @@ as_indicator(x, convert_na = FALSE, ...)
 \item{...}{Specific arguments passed to methods.}
 }
 \description{
-Convert Vectors to Indicators
+Indicators are binary integers where 0 stands for FALSE and 1 stands for
+TRUE. This generic is called by \code{ind_to_char} to convert variables into
+indicators. User can extend \code{ind_to_char} to support user-defined types
+by providing methods to this generic.
 }
+\section{Methods (by class)}{
+\itemize{
+\item \code{default}: Default method that works on atomic types.
+}}
+

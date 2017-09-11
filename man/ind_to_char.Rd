@@ -2,14 +2,18 @@
 % Please edit documentation in R/grp_routine.R
 \name{ind_to_char}
 \alias{ind_to_char}
-\alias{ind_to_char_}
+\alias{ind_to_char.data.frame}
+\alias{ind_to_char.grouped_df}
 \title{Convert indicator data.frame to character/factor.}
 \usage{
-ind_to_char(data, col, ..., ret_factor = FALSE, remove = TRUE,
-  na_as_false = FALSE)
+ind_to_char(data, col, ..., na_as_false = FALSE, ret_factor = FALSE,
+  remove = TRUE)
 
-ind_to_char_(data, col, from, ret_factor = FALSE, remove = TRUE,
-  na_as_false = FALSE)
+\method{ind_to_char}{data.frame}(data, col, ..., na_as_false = FALSE,
+  ret_factor = FALSE, remove = TRUE)
+
+\method{ind_to_char}{grouped_df}(data, col, ..., na_as_false = FALSE,
+  ret_factor = FALSE, remove = TRUE)
 }
 \arguments{
 \item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
@@ -22,14 +26,12 @@ that end with underscores).}
 Select all variables between \code{x} and \code{z} with \code{x:z}. For more
 options, see the \code{\link[dplyr]{select}} documentation.}
 
+\item{na_as_false}{Treat NAs as FALSE in indicators columns.}
+
 \item{ret_factor}{Whether to convert the column into factor.
 exhaustive.}
 
 \item{remove}{If \code{TRUE}, remove input column from output data frame.}
-
-\item{na_as_false}{Treat NAs as FALSE in indicators columns.}
-
-\item{from}{Names of existing columns as character vector}
 }
 \description{
 This is the reverse operation of using \code{\link[stats]{model.matrix}} on a
@@ -37,9 +39,11 @@ factor. \code{ind_to_char} works like \code{tidyr::unite}, it combines
 multiple indicator columns into one character/factor column and add it to
 the data.
 }
-\section{Functions}{
+\section{Methods (by class)}{
 \itemize{
-\item \code{ind_to_char_}: SE version of \code{ind_to_char}.
+\item \code{data.frame}: Method for data.frame.
+
+\item \code{grouped_df}: Method for grouped_df.
 }}
 
 \examples{
@@ -54,7 +58,7 @@ truth_table
 # Supports converting the following atomic types to indicator
 df <- data.frame(integer_ind = c(2L, 0L, 0L, 0L, 0L, 0L, 0L),
                  # non-zero integer is 1, otherwise 0.
-                 logcal_ind = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
+                 logical_ind = c(FALSE, TRUE, FALSE, FALSE, FALSE, FALSE, FALSE),
                  # TRUE is 1.
                  double_ind = c(0, 0, 2.0, 0, 0, 0, 0),
                  # non-zero double is 1.
@@ -67,22 +71,31 @@ df <- data.frame(integer_ind = c(2L, 0L, 0L, 0L, 0L, 0L, 0L),
                  # logical TRUE.
                  stringsAsFactors = FALSE)
 
-ind_to_char_(df, col = "new_y", from = names(df), remove = FALSE)
+# Keep original columns with remove = FALSE
+ind_to_char(df, col = new_y, integer_ind, logical_ind, double_ind,
+            char_ind, factor_ind, remove = FALSE)
+
 
 
 # ind_to_char as complement to use model.matrix on a factor
-df <- data.frame(x = 1:6, y = factor(c(letters[1:5], NA)))
+model_df <- data.frame(x = 1:6, y = factor(c(letters[1:5], NA)))
+model_df
 ind_df <- as.data.frame(model.matrix(~ x + y - 1,
-                                      model.frame(df, na.action = na.pass)))
+                                     model.frame(model_df,
+                                                 na.action = na.pass)))
 ind_df  # an indicator matrix with NAs
 
-# New character column is generated with non-selected columns kept as is.
-ind_to_char(ind_df, new_y, ya:ye, remove = FALSE)
-ind_to_char(ind_df, new_y, ya:ye)
-ind_to_char(ind_df, new_y, -x)
+# Convert back to one column like model_df
+ind_to_char(ind_df, new_y, ya, yb, yc, yd, ye)
+
 # Returns a factor column
 ind_to_char(ind_df, col = new_y, ya:ye, ret_factor = TRUE)
 
+
+# Use select helper functions as in dplyr::select
+ind_to_char(ind_df, new_y, contains("y"), remove = FALSE)
+ind_to_char(ind_df, new_y, starts_with("y"), remove = FALSE)
+
 # Using SE
-ind_to_char_(ind_df, col = "new_y", from = c("ya", "yb", "yc", "yd", "ye"))
+ind_to_char(ind_df, col = "new_y", "ya", "yb", "yc", "yd", "ye")
 }

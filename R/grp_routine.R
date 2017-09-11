@@ -16,7 +16,7 @@ grp_routine <- function(data, col, ..., ret_factor = FALSE,
                         na_as_false = FALSE) {
   col <- col_name(substitute(col))
   grp_routine_(data, col, .dots = lazyeval::lazy_dots(...),
-                  ret_factor = ret_factor, na_as_false = na_as_false)
+               ret_factor = ret_factor, na_as_false = na_as_false)
 }
 
 #' @describeIn grp_routine SE version of grp_routine.
@@ -54,21 +54,22 @@ grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE,
 #' @example examples/ind_to_char_ex.R
 #'
 #' @export
-ind_to_char <- function(data, col, ..., ret_factor = FALSE, remove = TRUE,
-                        na_as_false = FALSE) {
-  col <- col_name(substitute(col))
-  from <- dplyr::select_vars(colnames(data), ...)
-  ind_to_char_(data, col, from, ret_factor = ret_factor, remove = remove,
-               na_as_false = na_as_false)
+ind_to_char <- function(data, col, ..., na_as_false = FALSE,
+                        ret_factor = FALSE, remove = TRUE) {
+  UseMethod("ind_to_char")
 }
 
-
-#' @describeIn ind_to_char SE version of \code{ind_to_char}.
+#' @describeIn ind_to_char Method for data.frame.
 #' @export
-ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
-                         na_as_false = FALSE) {
+ind_to_char.data.frame <- function(data, col, ..., na_as_false = FALSE,
+                                   ret_factor = FALSE, remove = TRUE) {
+  col_name <- rlang::quo_name(enquo(col))
+  vars <- quos(...)
+  vars <- lapply(vars, rlang::env_bury, UQS(helpers))
 
-  ind_df <- data[from]
+  from_vars <- tidyselect::vars_select(colnames(data), UQS(vars))
+
+  ind_df <- data[from_vars]
   ind_df[] <- lapply(ind_df, as_indicator, convert_na = na_as_false)
 
   rs <- rowSums(ind_df)
@@ -94,25 +95,64 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
   # There should only be 1s or NAs in rs. 0s need to be converted to NA
   ind_df[is.na(rs) | (!is.na(rs) & rs < 1), ] <- NA_integer_
 
-  char_vec <- unname(from)[as.matrix(ind_df) %*% seq_along(from)]
 
-  if (ret_factor) char_vec <- factor(char_vec, levels = from)
+  char_vec <- unname(from_vars)[as.matrix(ind_df) %*% seq_along(from_vars)]
 
-  # Check new tidyr see if this still append_col
-  first_col <- which(names(data) %in% from)[1]
-  ret <- append_col(data, char_vec, col, first_col - 1)
+  if (ret_factor) char_vec <- factor(char_vec, levels = from_vars)
 
-  # Check whether this should be put into a method
-  # Give back groups
-  if (dplyr::is.grouped_df(data))
-    ret <- dplyr::group_by_(ret, .dots = dplyr::groups(data))
+  first_col <- which(names(data) %in% from_vars)[1]
 
-  if (remove) ret <- ret[setdiff(names(ret), from)]
+  if (remove) names_out <- setdiff(names(data), from_vars)
+  else names_out <- names(data)
 
-  ret
+  ordered_name <- append(names_out, col_name, after = first_col - 1)
+
+  # This setting only works for data.frame method
+  # other classes need their own method to add additional information
+  data %>%
+    dplyr::mutate(UQ(col_name) := char_vec) %>%
+    dplyr::select(ordered_name)
 }
 
+#' @describeIn ind_to_char Method for grouped_df.
+#' @export
+ind_to_char.grouped_df <- function(data, col, ..., na_as_false = FALSE,
+                                   ret_factor = FALSE, remove = TRUE) {
+  col_name <- rlang::quo_name(enquo(col))
+  from_vars <- tidyselect::vars_select(colnames(data), ...)
+
+  ret <- ind_to_char(as.data.frame(data), UQ(col_name), UQS(from_vars),
+                     na_as_false = na_as_false, ret_factor = ret_factor,
+                     remove = remove)
+
+  dplyr::group_by(ret, UQS(dplyr::groups(data)), add = TRUE)
+}
+
+#' @export
+ind_to_char_ <- function(data, col, from, na_as_false = FALSE,
+                         ret_factor = FALSE, remove = TRUE) {
+  UseMethod("ind_to_char_")
+}
+
+
+#' @export
+ind_to_char_.data.frame <- function(data, col, from, na_as_false = FALSE,
+                                    ret_factor = FALSE, remove = TRUE) {
+  col_name <- rlang::quo_name(enquo(col))
+  from <- rlang::syms(from)
+
+  ind_to_char(data, UQ(col), UQS(from),
+              na_as_false = na_as_false, ret_factor = ret_factor,
+              remove = remove)
+}
+
+
 #' Convert Vectors to Indicators
+#'
+#' Indicators are binary integers where 0 stands for FALSE and 1 stands for
+#' TRUE. This generic is called by \code{ind_to_char} to convert variables into
+#' indicators. User can extend \code{ind_to_char} to support user-defined types
+#' by providing methods to this generic.
 #'
 #' @param x Vector to be converted
 #' @param convert_na Whether NAs should be converted to FALSE.
@@ -126,6 +166,7 @@ as_indicator <- function(x, convert_na = FALSE, ...) {
   UseMethod("as_indicator")
 }
 
+#' @describeIn as_indicator Default method that works on atomic types.
 #' @export
 as_indicator.default <- function(x, convert_na = FALSE, ...) {
   # convert_na is a switch to add !is.na(x)
