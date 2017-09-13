@@ -88,8 +88,8 @@ ind_to_char.data.frame <- function(data, col, ..., na_as_false = FALSE,
     # This checks any partial NA in one row. All NA is allowed.
     # If na_as_false = TRUE, all NAs will be converted to FALSE so this won't
     # be activated.
-    warning(paste("Some indicators contain missing values.",
-                  "To allow missing values in indicators,",
+    warning(paste("Some indicators contain missing values, NAs introduced.",
+                  "To treat missing values as FALSE in indicators,",
                   "set na_as_false = TRUE."))
   }
 
