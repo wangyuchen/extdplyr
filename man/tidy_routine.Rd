@@ -19,7 +19,9 @@ contain the value of \code{spread} and match the matching groups in
 
 \item{regex}{a regular expression used to extract the desired values.}
 
-\item{spread}{The variable used to spread, the default is \code{"var"}.}
+\item{spread}{The variable used to spread, the default is \code{"var"}. If
+\code{spread} is not one of the \code{into} variables,
+\code{\link[tidyr]{spread}} will not be called.}
 }
 \description{
 Reshape data into a tidy format.
