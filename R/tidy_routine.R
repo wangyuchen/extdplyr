@@ -28,7 +28,7 @@ tidy_routine.data.frame <- function(data, into, regex = "([[:alnum:]]+)",
     stop(paste("'spread' must be an element of 'into'."))
   }
 
-  out <- data %>%
+  data %>%
     # gather cols that match regex into key and value
     tidyr::gather(key = "key", value = "value", dplyr::matches(regex)) %>%
     # extract using the same regex (old variable names)
@@ -38,6 +38,4 @@ tidy_routine.data.frame <- function(data, into, regex = "([[:alnum:]]+)",
     dplyr::mutate_at(into, dplyr::funs(factor(., unique(.)))) %>%
     tidyr::spread(key = spread, value = "value") %>%
     dplyr::mutate_at(into[into != spread], as.character)
-
-
 }
