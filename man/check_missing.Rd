@@ -2,12 +2,15 @@
 % Please edit documentation in R/check_missing.R
 \name{check_missing}
 \alias{check_missing}
-\alias{check_missing_}
+\alias{check_missing.data.frame}
+\alias{check_missing.default}
 \title{Check missing rate in variables.}
 \usage{
 check_missing(data, ..., ret_prop = TRUE)
 
-check_missing_(data, ..., .dots, ret_prop = TRUE)
+\method{check_missing}{data.frame}(data, ..., ret_prop = TRUE)
+
+\method{check_missing}{default}(data, ...)
 }
 \arguments{
 \item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
@@ -28,18 +31,18 @@ represent column positions. They support
 \code{vignette("programming")} for an introduction to these concepts.}
 
 \item{ret_prop}{Whether to return the rate of missing (default) or counts.}
-
-\item{.dots}{Used in conjunction with \code{...} to support both explicit
-and implicit arguments.}
 }
 \description{
 Check missing (\code{NA}) proportion or counts of variables. This function
 works like \code{\link[dplyr]{summarize_at}} where the missing rate or
 count for the selected columns are returned.
 }
-\section{Functions}{
+\section{Methods (by class)}{
 \itemize{
-\item \code{check_missing_}: SE version of check_missing.
+\item \code{data.frame}: S3 method for data.frame.
+
+\item \code{default}: default method for new NSE generic that dispatches
+to the NSE generic for backward compatibility.
 }}
 
 \author{
