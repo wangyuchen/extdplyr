@@ -16,6 +16,7 @@ check_missing <- function(data, ..., ret_prop = TRUE) {
                  ret_prop = ret_prop)
 }
 
+#' @importFrom dplyr n
 #' @describeIn check_missing SE version of check_missing.
 #' @export
 check_missing_ <- function(data, ..., .dots, ret_prop = TRUE) {
