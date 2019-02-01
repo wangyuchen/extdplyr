@@ -24,7 +24,7 @@ options, see the \code{\link[dplyr]{select}} documentation.}
 
 \item{ret_factor}{Whether to convert the column into factor.}
 
-\item{remove}{If \code{TRUE}, remove input columns from output data frame.}
+\item{remove}{If \code{TRUE}, remove input column from output data frame.}
 
 \item{mutually_exclusive}{Check if the indicators are mutually exclusive.}
 

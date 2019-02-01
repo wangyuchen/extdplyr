@@ -16,6 +16,6 @@ Imports:
     dplyr,
     tidyr,
     lazyeval
-RoxygenNote: 6.0.1
+RoxygenNote: 6.1.1
 Suggests: testthat,
     data.table
