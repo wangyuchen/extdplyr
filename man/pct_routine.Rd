@@ -7,11 +7,23 @@
 \alias{tally_pct_}
 \title{Calculate percentage by group.}
 \usage{
-pct_routine(data, ..., wt = NULL, ret_name = "pct", rebase = FALSE,
-  ungroup = FALSE)
+pct_routine(
+  data,
+  ...,
+  wt = NULL,
+  ret_name = "pct",
+  rebase = FALSE,
+  ungroup = FALSE
+)
 
-pct_routine_(data, vars, wt = NULL, ret_name = "pct", rebase = FALSE,
-  ungroup = FALSE)
+pct_routine_(
+  data,
+  vars,
+  wt = NULL,
+  ret_name = "pct",
+  rebase = FALSE,
+  ungroup = FALSE
+)
 
 tally_pct(data, wt = NULL, ret_name = "pct", rebase = FALSE)
 

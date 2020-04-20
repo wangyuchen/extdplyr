@@ -49,7 +49,7 @@ tally_pct <- function(data, wt = NULL, ret_name = "pct", rebase = FALSE) {
 #' @export
 tally_pct_ <- function(data, wt = NULL, ret_name = "pct", rebase = FALSE) {
   if (is.null(wt)) {
-    expr <- quote(n())
+    expr <- quote(dplyr::n())
   } else {
     expr <- interp(quote(sum(wt, na.rm = TRUE)), wt = as.name(wt))
   }

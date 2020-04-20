@@ -6,7 +6,7 @@
 #'
 #'
 #' @inheritParams common_params
-#' @inheritParams dplyr::select
+#' @param ... Pass to tidyselect. See [dplyr::dplyr_tidy_select] for details.
 #' @param ret_prop Whether to return the rate of missing (default) or counts.
 #'
 #' @author Min Ma
