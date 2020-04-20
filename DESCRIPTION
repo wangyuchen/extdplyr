@@ -1,7 +1,7 @@
 Package: extdplyr
 Type: Package
 Title: Data Manipulation Extensions of 'Dplyr' and 'Tidyr'
-Version: 0.1.4
+Version: 0.1.5
 Authors@R: person("Yuchen", "Wang", email = "ycwang0712@gmail.com",
     role = c("aut", "cre"))
 Description: If 'dplyr' is a grammar for data manipulation, 'extdplyr' is like
@@ -16,6 +16,6 @@ Imports:
     dplyr,
     tidyr,
     lazyeval
-RoxygenNote: 6.1.1
+RoxygenNote: 7.1.0
 Suggests: testthat,
     data.table

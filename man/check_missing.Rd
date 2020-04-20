@@ -12,24 +12,7 @@ check_missing_(data, ..., .dots, ret_prop = TRUE)
 \arguments{
 \item{data}{A \code{\link[base]{data.frame}} or \code{\link[dplyr]{tbl}}.}
 
-\item{...}{One or more unquoted expressions separated by commas.
-You can treat variable names like they are positions, so you can
-use expressions like \code{x:y} to select ranges of variables.
-
-Positive values select variables; negative values drop variables.
-If the first expression is negative, \code{select()} will automatically
-start with all variables.
-
-Use named arguments, e.g. \code{new_name = old_name}, to rename selected variables.
-
-The arguments in \code{...} are automatically \link[rlang:quo]{quoted} and
-\link[rlang:eval_tidy]{evaluated} in a context where column names
-represent column positions. They also support
-\link[rlang:quasiquotation]{unquoting} and splicing. See
-\code{vignette("programming")} for an introduction to these concepts.
-
-See \link[tidyselect:select_helpers]{select helpers} for more details and
-examples about tidyselect helpers such as \code{starts_with()}, \code{everything()}, ...}
+\item{...}{Pass to tidyselect. See [dplyr::dplyr_tidy_select] for details.}
 
 \item{ret_prop}{Whether to return the rate of missing (default) or counts.}
 

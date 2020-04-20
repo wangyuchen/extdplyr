@@ -45,7 +45,7 @@ test_that("ind_to_char_ works with non-integer indicators", {
 library(dplyr)
 test_that("ind_to_char_ works with tbl_df, tbl, data.frame", {
   df <- data.frame(x = 1:5, y = factor(c(letters[1:5])))
-  ind_df <- as_data_frame(model.matrix(~ x + y - 1, df))
+  ind_df <- as_tibble(model.matrix(~ x + y - 1, df))
 
   # Using SE
   df_ret <- ind_to_char_(ind_df, col = "new_y",
@@ -67,7 +67,7 @@ test_that("ind_to_char_ works with tbl_df, tbl, data.frame", {
 
 test_that("ind_to_char_ works with grouped_df, tbl_df, tbl, data.frame", {
   df <- data.frame(x = 1:5, y = factor(c(letters[1:5])))
-  ind_df <- as_data_frame(model.matrix(~ x + y - 1, df)) %>%
+  ind_df <- as_tibble(model.matrix(~ x + y - 1, df)) %>%
     group_by(z = x > 3)
 
   # Using SE

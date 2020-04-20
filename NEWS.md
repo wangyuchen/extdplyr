@@ -1,3 +1,12 @@
+# extdplyr 0.1.5
+
+* Fixed some issue with the upcoming of `dplyr` 1.0.0.
+  * `as_data_frame` deprecated
+  * `n()` needs explicit import
+  * grouped_df structure change
+  * tidyselect document change
+
+
 # extdplyr 0.1.4
 
 * Added tests for `ind_to_char_` to check compatibility for `tbl_df` and `data.table`.

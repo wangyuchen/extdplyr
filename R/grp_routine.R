@@ -35,7 +35,7 @@ grp_routine_ <- function(data, col, ..., .dots, ret_factor = FALSE) {
 #' Convert indicator data.frame to character/factor.
 #'
 #' This is the reverse operation of using \code{\link[stats]{model.matrix}} a
-#' factor. \code{ind_to_char} works like \code{dplyr::unite}, it combines
+#' factor. \code{ind_to_char} works like \code{tidyr::unite}, it combines
 #' multiple indicator columns into one character/factor column and add it to
 #' the data.
 #'
@@ -77,10 +77,10 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
   rs <- rowSums(int_df)
 
   if (mutually_exclusive) {
-   if (any(rs > 1, na.rm = TRUE)) {
-     # Have to stop here, because don't know which one to take
-     stop("Indicators are not mutually exclusive, check overlaps.")
-   }
+    if (any(rs > 1, na.rm = TRUE)) {
+      # Have to stop here, because don't know which one to take
+      stop("Indicators are not mutually exclusive, check overlaps.")
+    }
   }
 
   if (collectively_exhaustive) {
@@ -96,11 +96,14 @@ ind_to_char_ <- function(data, col, from, ret_factor = FALSE, remove = TRUE,
   if (ret_factor) char_vec <- as.factor(char_vec)
 
   first_col <- which(names(data) %in% from)[1]
-  ret <- append_col(data, char_vec, col, first_col - 1)
+  ret <- append_col(data, char_vec, col, after = first_col - 1L)
+
 
   # Give back groups
-  if (dplyr::is.grouped_df(data))
-    ret <- dplyr::group_by_(ret, .dots = dplyr::groups(data))
+  if (dplyr::is.grouped_df(data)) {
+    groups <- dplyr::group_vars(data)
+    ret <- dplyr::grouped_df(ret, groups)
+  }
 
   if (remove) ret <- ret[setdiff(names(ret), from)]
 

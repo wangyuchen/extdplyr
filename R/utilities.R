@@ -28,16 +28,29 @@ common_params <- function(data, col, .dots) {
 
 
 # Adapted from tidyr
-append_df <- function (x, values, after = length(x)) {
-  y <- append(x, values, after = after)
-  class(y) <- class(x)
-  attr(y, "row.names") <- attr(x, "row.names")
-  y
+append_df <- function (x, y, after = length(x), remove = FALSE) {
+  if (is.character(after)) {
+    after <- match(after, dplyr::tbl_vars(x))
+  } else if (!is.integer(after)) {
+    stop("`after` must be character or integer", call. = FALSE)
+  }
+
+  x_vars <- setdiff(names(x), names(y))
+
+  if (remove) {
+    x_vars <- setdiff(x_vars, names(x)[[after]])
+    after <- after - 1L
+  }
+
+  y <- append(x[x_vars], y, after = after)
+  structure(y, class = class(x), row.names = .row_names_info(x, 0L))
 }
 
 append_col <- function (x, col, name, after = length(x)) {
   name <- enc2utf8(name)
-  append_df(x, named_expr(name, col), after = after)
+  new_col <- list(col)
+  names(new_col) <- name
+  append_df(x, new_col, after = after)
 }
 
 
